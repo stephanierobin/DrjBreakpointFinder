@@ -153,7 +153,7 @@ mkdir -p $summaryDir
 
 R --slave --vanilla --quiet --no-save  <<MyRScript4
 
-source("draw_summary.R")
+source("draw_summary_scaffolds.R")
 drawAllSummary(pairDir="$pairDir",outputDir="$summaryDir",readNames=FALSE,addSimi="$vectorPairDir",merge=TRUE)
 MyRScript4
 
