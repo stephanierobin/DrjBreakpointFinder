@@ -90,11 +90,11 @@ alignDir=$breakpointDir/align
 figureDir=$breakpointDir/figures
 segmentationResult=$breakpointDir/segmentation.tab
 multipleLog=$breakpointDir/list-multiple-exaequo.txt
-pairDir=$resdir/${scaffold_name}/drjPairs_all_segments
-pairDirFinal=$resdir/${scaffold_name}/drjPairs_merged_segments
-confirmedDrjPairs=$resdir/${scaffold_name}/drjPairs_confirmed.tab
-summaryDir=$resdir/${scaffold_name}/drjPairs_figures
-alignPairDir=$resdir/${scaffold_name}/drjPairs_alignments
+pairDir=$resdir/drjPairs_all_segments
+pairDirFinal=$resdir/drjPairs_merged_segments
+confirmedDrjPairs=$resdir/drjPairs_confirmed.tab
+summaryDir=$resdir/drjPairs_figures
+alignPairDir=$resdir/drjPairs_alignments
 vectorPairDir=$alignPairDir/vectors
 
 
