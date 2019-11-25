@@ -8,10 +8,10 @@ reset=`tput sgr0`
 
 function help {
     echo $reset
-echo "====================================================="
+echo "====================="
 echo "DrjBreakpointFinder"
-echo "====================================================="
-echo "Usage: ./pipeline.sh -r reads.fasta -g genome.fasta -o output_directory"
+echo "====================="
+echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -o output_directory"
 }
 
 while getopts "r:g:o:h" opt; do
@@ -68,20 +68,21 @@ source /local/env/envemboss.sh
 #bacs="final_bacs_shortname.fasta"
 #reads="HdIV_SANGER_clean_min100.fasta"
 #resdir="."
-resdir=$(pwd)
+#resdir=$(pwd)
 #resdir=".."
 #genome="Hd_genome_1.0"
 #scaffold_name=`basename $1 .m8`
 #SCAFFOLD=$1
 #scaffold_name="${SCAFFOLD%.*}"
 
+
 ## Intermediate files or directories
-blastDir=$resdir/blast
-blastFile=$resdir/megablast_result.m8
+blastDir=$output/blast
+blastFile=$blastDir/megablast_result.m8
 #readLength=$inputDir/$(basename $inputDir/$reads .fasta)"_rlength.tab"
 readLength=$(basename $reads .fasta)"_rlength.tab"
 
-breakpointDir=$resdir/breakpoint
+breakpointDir=$output/breakpoint
 #breakpointDir=$resdir/${scaffold_name}/breakpoint
 drjPairs=$breakpointDir/drjPairs.tab
 seqCoordPairs=$breakpointDir/seqCoordPairs.tab
@@ -90,19 +91,19 @@ alignDir=$breakpointDir/align
 figureDir=$breakpointDir/figures
 segmentationResult=$breakpointDir/segmentation.tab
 multipleLog=$breakpointDir/list-multiple-exaequo.txt
-pairDir=$resdir/drjPairs_all_segments
-pairDirFinal=$resdir/drjPairs_merged_segments
-confirmedDrjPairs=$resdir/drjPairs_confirmed.tab
-summaryDir=$resdir/drjPairs_figures
-alignPairDir=$resdir/drjPairs_alignments
+pairDir=$output/drjPairs_all_segments
+pairDirFinal=$output/drjPairs_merged_segments
+confirmedDrjPairs=$output/drjPairs_confirmed.tab
+summaryDir=$output/drjPairs_figures
+alignPairDir=$output/drjPairs_alignments
 vectorPairDir=$alignPairDir/vectors
 
-
+mkdir $output
 mkdir -p $blastDir
 
 formatdb -i $genome -p F -o T
 megablast -i $reads -d $genome -o $blastFile -m8 > $blastDir/megablast.log 2>&1
-mv $resdir/formatdb.log $blastDir/
+mv formatdb.log $blastDir/
 
 echo "Megablast finished"
 
