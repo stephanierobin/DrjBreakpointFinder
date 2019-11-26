@@ -47,43 +47,19 @@ if [[ -z "${output}" ]]; then
     echo "${red}-o is mandatory$reset" >&2
     exit
 fi
-## Programmes
-#sources="../programs"
-
-## ma machine :
-#alias clustalw='/Applications/Bioinfo/clustalw2' # ok
-# blast
-#PATH=$PATH:$HOME/Bin/blast-2.2.26/bin/
 
 
 ## Genocluster :
 source /local/env/envclustalw.sh
 source /local/env/envncbi.sh
-#source /local/env/envR-2.14.2.sh
 source /local/env/envr-3.5.1.sh
 source /local/env/envemboss.sh
-
-## Input data
-#inputDir="../data/formatted-data"
-#bacs="final_bacs_shortname.fasta"
-#reads="HdIV_SANGER_clean_min100.fasta"
-#resdir="."
-#resdir=$(pwd)
-#resdir=".."
-#genome="Hd_genome_1.0"
-#scaffold_name=`basename $1 .m8`
-#SCAFFOLD=$1
-#scaffold_name="${SCAFFOLD%.*}"
-
 
 ## Intermediate files or directories
 blastDir=$output/blast
 blastFile=$blastDir/megablast_result.m8
-#readLength=$inputDir/$(basename $inputDir/$reads .fasta)"_rlength.tab"
 readLength=$(basename $reads .fasta)"_rlength.tab"
-
 breakpointDir=$output/breakpoint
-#breakpointDir=$resdir/${scaffold_name}/breakpoint
 drjPairs=$breakpointDir/drjPairs.tab
 seqCoordPairs=$breakpointDir/seqCoordPairs.tab
 vectorDir=$breakpointDir/vectors
@@ -107,12 +83,10 @@ mv formatdb.log $blastDir/
 
 echo "Megablast finished"
 
-#perl get_read_length.pl  -reads $inputDir/$nb_reads -out $readLength
+perl get_read_length.pl  -reads $reads -out $readLength
 
 mkdir -p $breakpointDir
-#echo "pwd breakpoint"
-#echo $(pwd)
-#echo $breakpointDir
+
 
 R --slave --vanilla --quiet --no-save  <<MyRScript1
 
