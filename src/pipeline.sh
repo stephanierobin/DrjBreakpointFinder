@@ -11,10 +11,10 @@ function help {
 echo "====================="
 echo "DrjBreakpointFinder"
 echo "====================="
-echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -o output_directory"
+echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -i input_directory -o output_directory"
 }
 
-while getopts "r:g:o:h" opt; do
+while getopts "r:g:i:o:h" opt; do
     case $opt in
         r)
         reads=$OPTARG
@@ -22,6 +22,10 @@ while getopts "r:g:o:h" opt; do
 
         g)
         genome=$OPTARG
+        ;;
+
+        i)
+        input=$OPTARG
         ;;
 
         o)
@@ -43,6 +47,10 @@ if [[ -z "${genome}" ]]; then
     echo "${red}-g is mandatory$reset" >&2
     exit
 fi
+if [[ -z "${input}" ]]; then
+    echo "${red}-i is mandatory$reset" >&2
+    exit
+fi
 if [[ -z "${output}" ]]; then
     echo "${red}-o is mandatory$reset" >&2
     exit
@@ -58,7 +66,7 @@ source /local/env/envemboss.sh
 ## Intermediate files or directories
 blastDir=$output/blast
 blastFile=$blastDir/megablast_result.m8
-readLength=$(basename $reads .fasta)"_rlength.tab"
+readLength=$input/$(basename $reads .fasta)"_rlength.tab"
 breakpointDir=$output/breakpoint
 drjPairs=$breakpointDir/drjPairs.tab
 seqCoordPairs=$breakpointDir/seqCoordPairs.tab
@@ -91,12 +99,11 @@ mkdir -p $breakpointDir
 R --slave --vanilla --quiet --no-save  <<MyRScript1
 
 source("get_fully_overlapping_triplets.R")
-
 getFullyOverlappingTriplets(blastFile="$blastFile",readLengthFile="$readLength",coordFile="$seqCoordPairs",drjPairsFile="$drjPairs")
+
 MyRScript1
 
  echo "Triplets selection finished"
-
 
  perl align_and_get_mismatch_vectors.pl -coord $seqCoordPairs -bacs $genome -reads $reads -dirFasta $breakpointDir/tmp -dirAlign $alignDir -dirVector $vectorDir
 
@@ -110,14 +117,16 @@ R --slave --vanilla --quiet --no-save  <<MyRScript2
 
 source("get_segmentation.R")
 segmentASetOfSequences("$seqCoordPairs","$vectorDir","$figureDir","$segmentationResult",zoom=T,margin=20)
+
 source("get_segmentations_by_DRJpairs.R")
 getAllValidSegmentationsByDRJPair(segmentationFile="$segmentationResult",drjPairsFile="$drjPairs",pairDir="$pairDir",confirmedDrjPairFile="$confirmedDrjPairs",multipleLog="$multipleLog")
+
 source("merge_segments_on_drj_pairs.R")
 mergeAllDrjs(inputPairDir="$pairDir",outputPairDir="$pairDirFinal")
+
 MyRScript2
 
 echo "All segmentations finished"
-
 
 mkdir -p $alignPairDir
 perl align_drjPairs.pl -coord $drjPairs -bacs $genome -dirFasta $alignPairDir/tmp -dirAlign $alignPairDir/align -dirVector $vectorPairDir
@@ -130,6 +139,7 @@ R --slave --vanilla --quiet --no-save  <<MyRScript4
 
 source("draw_summary_scaffolds.R")
 drawAllSummary(pairDir="$pairDir",outputDir="$summaryDir",readNames=FALSE,addSimi="$vectorPairDir",merge=TRUE)
+
 MyRScript4
 
 echo "Summary plots finished"
