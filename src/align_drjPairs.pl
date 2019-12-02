@@ -1,6 +1,12 @@
 #!/usr/bin/perl
 #*****************
 
+# #############################################################################
+# This program aligns and creates the mismatch vector for each pair of DRJs
+#
+# Author: Claire Lemaitre
+# #############################################################################
+
 use strict;
 use warnings;
 use Getopt::Long;
@@ -166,11 +172,11 @@ sub extract_mismatch_vectors_from_drj_ma {
 
     my $infile=shift;
     my $outfile=shift;
-    
+
     my %sequences=();
     my $name;
     my $nseq=0;
-    
+
     open(R,"<$infile") or die "cannot open file $infile\n";
     while(<R>){
 	chomp();
@@ -189,32 +195,32 @@ sub extract_mismatch_vectors_from_drj_ma {
     ## -------------------------------------------
     my %bac_inf=();
     foreach my $seq_name (keys(%sequences)){
-	
+
 	if ($seq_name=~/^bac/){
 	    my ($inf)= $seq_name=~/^bac_(\d+)-/;
 	    $bac_inf{$seq_name}=$inf;
 	}
     }
-    
+
     my @bacs = sort { $bac_inf{$a} <=> $bac_inf{$b} } keys(%bac_inf);
-    
+
     ## Finding the mismatches
     ## ----------------------
     my $al_length=length($sequences{$bacs[0]});
     my $b1_letter="";
     my $b2_letter="";
     my @vector1;
-    
+
     # pour compter où on en est sur lesséquences de bacs
     my $compt1=0;
     my @vecPos1;
 
     for (my $i=0;$i<$al_length;$i++){
-	
+
 	$b1_letter=substr($sequences{$bacs[0]},$i,1);
 	$b2_letter=substr($sequences{$bacs[1]},$i,1);
 	if($b2_letter ne "-"){$compt1++;}
-	
+
 	if($b1_letter eq "-"){
 	    my $t=@vector1;
 	    if($t>0){
@@ -227,7 +233,7 @@ sub extract_mismatch_vectors_from_drj_ma {
 	}
 
     }
-	
+
     ## writing the results
     open(OUTPUT,">$outfile") or die "cannot open file $outfile\n";
     my $t=@vector1;
@@ -237,4 +243,3 @@ sub extract_mismatch_vectors_from_drj_ma {
     }
     close(OUTPUT);
 }
-

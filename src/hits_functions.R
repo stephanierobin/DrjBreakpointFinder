@@ -1,8 +1,8 @@
-## Claire Lemaitre
-## 03/08/2011
-
-## some functions for parsing blast hits
-
+# #############################################################################
+# This file contains some functions for parsing blast hits
+#
+# Author: Claire Lemaitre
+# #############################################################################
 
 ## Formate le fichier brut de résultat de blast/megablast (m8)
 ##  - enleve les colonnes inutiles
@@ -60,7 +60,7 @@ removeEmbeddedHits=function(blastTable,self=F,rename=F){
   else{
     couples=blastTable$couple
   }
-  
+
   if(!is.element("id",names(blastTable))){
     blastTable$id=1:nrow(blastTable)
   }
@@ -78,7 +78,7 @@ removeEmbeddedHits=function(blastTable,self=F,rename=F){
   if(!is.element("orient",names(tmpTable))){
     tmpTable$orient=ifelse(tmpTable$inf2<tmpTable$sup2,1,-1)
   }
-  
+
   ## met les inf2<sup2 :
   inf2=pmin(tmpTable$inf2,tmpTable$sup2)
   sup2=pmax(tmpTable$inf2,tmpTable$sup2)
@@ -99,7 +99,7 @@ removeEmbeddedHits=function(blastTable,self=F,rename=F){
   else{
     return(blastTable[!is.element(blastTable$id,removeList),])
   }
-  
+
 }
 
 
@@ -212,7 +212,7 @@ getWellOrderedPairs=function(tab,orient=1,seuil=0){
 
   finalTab$totalSize=pmax(finalTab$sup2.1,finalTab$sup2.2)-pmin(finalTab$inf2.1,finalTab$inf2.2)+1
   finalTab$drjSize=finalTab$sup1.1-finalTab$inf1.2
-  
+
   return(finalTab)
 
 }

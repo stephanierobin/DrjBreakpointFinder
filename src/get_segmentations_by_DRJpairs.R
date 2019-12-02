@@ -1,4 +1,8 @@
-
+# ###################################################################################
+# This file contains the definition of the function getAllValidSegmentationsByDRJPair
+#
+# Author: Claire Lemaitre
+# ####################################################################################
 
 getAllValidSegmentationsByDRJPair=function(segmentationFile,drjPairsFile,pairDir,confirmedDrjPairFile=NULL,multipleLog=NULL){
 
@@ -12,10 +16,10 @@ getAllValidSegmentationsByDRJPair=function(segmentationFile,drjPairsFile,pairDir
     con=file(multipleLog,"w")
     close(con)
   }
-  
+
   listeChoosenId=NULL
   tabRead=data.frame(id=NULL,read=NULL,multi=NULL)
-  
+
   ## Selection d'une seule segmentation par read :
   for (r in listeReads){
     ## listeId=coordTab$V1[as.character(coordTab$V3)==r]
@@ -40,7 +44,7 @@ getAllValidSegmentationsByDRJPair=function(segmentationFile,drjPairsFile,pairDir
   segmentTab$segType[segmentTab$nbAlt>0]=1
   segmentTab$segType[segmentTab$nbDiff>0]=2
   segmentTab$segType[segmentTab$nbAlt>0 & segmentTab$nbDiff>0]=3
-  
+
   segment2=merge(segmentTab[,c("id","br.beg1","br.end1","br.beg2","br.end2","stat","segType")],tabRead,by="id")
   names(segment2)=c("id","inf1","sup1","inf2","sup2","stat","segType","read","multi")
 
@@ -49,14 +53,14 @@ getAllValidSegmentationsByDRJPair=function(segmentationFile,drjPairsFile,pairDir
   segment2$doublon=rep(FALSE,nrow(segment2))
   segment2$FvsR=rep(0,nrow(segment2))
   segment2=addDoublonInfo(segment2)
-  
+
   ## ajout des debuts et fins des reads sur les drjs :
   ## names(coordTab)[1:7]=c("id","bac","read","infRead1","supRead1","infRead2","supRead2")
   ## segment3=merge(segment2,coordTab[,c("id","infRead1","supRead1","infRead2","supRead2")],by="id")
   ## segmentFinal=segment3[,c("id","frag","read","doublon","multi","infRead1","supRead1","inf1bk","sup1bk","infRead2","supRead2","inf2bk","sup2bk","stat","segType","FvsR")]
 
   segmentFinal=segment2[,c("id","frag","read","doublon","multi","inf1","sup1","inf2","sup2","stat","segType","FvsR")]
-  
+
   ## découpage par paire de DRJs et écriture des résultats
   drjPairs=read.table(drjPairsFile,h=T)
   drjPairs$nbSupport=rep(0,nrow(drjPairs))
@@ -90,7 +94,7 @@ chooseMulti=function(segmentForARead,multipleLog=NULL){
 
   id=NULL
   sel=segmentForARead[segmentForARead$stat==1,]
-  ## il faut stat =1 
+  ## il faut stat =1
   if(nrow(sel)>1){
     sc=sel$nbAlt+sel$nbDiff
     ## on veut un score mini
@@ -98,7 +102,7 @@ chooseMulti=function(segmentForARead,multipleLog=NULL){
     index=which(sc==min.sc)
 
     sel2=sel[index,c("bac","br.beg1","br.end1","br.beg2","br.end2")]
-    
+
     if(nrow(unique(sel2))==1){ ## si un seul id ou bien si une seule paire de région
       id=sel$id[index[1]]
     }
@@ -129,9 +133,9 @@ removeStrandSuffix=function(readName){
 }
 
 addDoublonInfo=function(segmentTab){
-  
+
   dupliques=segmentTab$frag[duplicated(segmentTab$frag)]
-    
+
   for (f in dupliques){
     segmentTab$doublon[segmentTab$frag==f]=TRUE
     tmp=segmentTab[segmentTab$frag==f,c("inf1","sup1","inf2","sup2")]
@@ -142,6 +146,6 @@ addDoublonInfo=function(segmentTab){
       segmentTab$FvsR[segmentTab$frag==f]=1
     }
   }
-  
+
   return(segmentTab)
 }

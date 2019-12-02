@@ -1,3 +1,9 @@
+# #######################################################################################
+# This file contains the definition of the function drawAllSummary for scaffolds analyses
+#
+# Authors: Claire Lemaitre and Stéphanie Robin
+# ########################################################################################
+
 ###########################################################
 #   For all pairs of DRJs draw segmentation on the DRJs   #
 #         name = TRUE : display the id of the read        #
@@ -12,7 +18,7 @@ drawAllSummary=function(pairDir,outputDir,readNames=FALSE,addSimi=NULL,merge=FAL
 }
 
 ## TODO : addSimi
-## Stéphanie : modif des coordonnes du tableau pour que ca corresponde aux scaffolds 
+## Stéphanie : modif des coordonnes du tableau pour que ca corresponde aux scaffolds
 drawByFile=function(file,outputDir,readNames=FALSE,addSimi=NULL,merge=FALSE){
 
   fileName=strsplit(tail(strsplit(file,"/")[[1]],1),".tab")[[1]][1]
@@ -22,11 +28,11 @@ drawByFile=function(file,outputDir,readNames=FALSE,addSimi=NULL,merge=FALSE){
   supDRJ1=as.numeric(coord.DRJs[5])
   infDRJ2=as.numeric(coord.DRJs[6])
   supDRJ2=as.numeric(coord.DRJs[7])
-  
+
   allSeg=read.table(file,header=TRUE)
   allSeg=allSeg[order(allSeg$inf1,allSeg$sup1,allSeg$read),]
   nbReads=nrow(allSeg)
-  
+
   nbMer=0
   yMer=NULL
   if(merge){
@@ -36,20 +42,20 @@ drawByFile=function(file,outputDir,readNames=FALSE,addSimi=NULL,merge=FALSE){
     nbMer=nrow(merged)
   }
 
-  
+
   index.doublon=which(allSeg$doublon==TRUE)
-  
+
   xtitle=paste("Position on bac",bac)
   ytitle="Reads"
-  
+
   pdf(paste(outputDir,"/",fileName,".pdf",sep=""),width = 11, height = 6, onefile = FALSE)
-  
+
   par(mfrow=c(1,2), mar=c(5,4,1.5,1), oma=c(0,0,2,0))
   y=1:nbReads
   couleur=ifelse(allSeg$multi,"orange","red")
   couleur=ifelse(allSeg$segType>0,"grey40",couleur)
-  
-  ## DRJ1 
+
+  ## DRJ1
   plot(c(infDRJ1,supDRJ1),c(-nbMer,nbReads),type="n",xlab=xtitle,ylab=ytitle,main="DRJ1")
 
   if(!is.null(addSimi)){
@@ -81,13 +87,13 @@ drawByFile=function(file,outputDir,readNames=FALSE,addSimi=NULL,merge=FALSE){
     abline(h=0,lty=2,col="grey")
   }
   segments(allSeg$inf1,y,allSeg$sup1,y, col=couleur)
-  
+
   points(allSeg$sup1[index.doublon],index.doublon,pch="*")
   if(readNames==TRUE){
     text(allSeg$inf1, y,labels=as.character(allSeg$id),cex=0.5)
   }
 
-  
+
   ## DRJ2
   plot(c(infDRJ2,supDRJ2),c(-nbMer,nbReads),type="n",xlab=xtitle,ylab=ytitle,main="DRJ2")
   if(merge){
@@ -107,12 +113,12 @@ drawByFile=function(file,outputDir,readNames=FALSE,addSimi=NULL,merge=FALSE){
     ##         type="l",col="green")
     ## }
   }
-  
-  
+
+
   mtext(paste(fileName," : ",length(unique(allSeg$frag))," fragments différents",sep=""), side=3, line=0, adj=0.5, cex=1.4, outer=TRUE)
-  
+
   dev.off()
-  
+
 }
 
 
@@ -132,7 +138,7 @@ compareSummary=function(refDir,outputDir=NULL,outputFile=NULL,additionalDir=NULL
   if(!is.null(outputFile)){
     dev.off()
   }
-  
+
   ## formate les stats de nb de reads par paire de DRJ, sous la forme d'un tableau
   nbAdd=length(additionalDir)
   tmp=matrix(unlist(draw),ncol=3+nbAdd*2,byrow=T)
@@ -144,13 +150,13 @@ compareSummary=function(refDir,outputDir=NULL,outputFile=NULL,additionalDir=NULL
   else{
     names(tmp2)=c("tot","good")
   }
-  
+
   tmp2$name=tmp[,1]
   n=ncol(tmp2)
   stats=tmp2[,c(n,1:(n-1))]
 
-  return(stats)  
-  
+  return(stats)
+
 }
 
 
@@ -166,14 +172,14 @@ drawAndCompareByFile=function(file,outputDir=NULL,addDir=NULL,dirNames=NULL,addS
   supDRJ1=as.numeric(coord.DRJs[3])
   infDRJ2=as.numeric(coord.DRJs[4])
   supDRJ2=as.numeric(coord.DRJs[5])
-  
+
   allSeg=read.table(file,header=TRUE)
   allSeg=allSeg[order(allSeg$inf1,allSeg$sup1,allSeg$read),]
   nbReads=nrow(allSeg)
 
   stats=c(nbReads,nbReads-sum(allSeg$segType>0))
 
-   
+
   nbAdd=0
   y.add=NULL
   max.y=nbReads
@@ -193,7 +199,7 @@ drawAndCompareByFile=function(file,outputDir=NULL,addDir=NULL,dirNames=NULL,addS
         x2.add=c(x2.add,add$sup1)
         new.max=max.y+1+nrow(add)
         y.add=c(y.add,(max.y+2):new.max)
-        
+
         cols=ifelse(add$multi,"orange","red")
         cols=ifelse(add$segType>0,"grey40",cols)
         couleur.add=c(couleur.add,cols)
@@ -215,9 +221,9 @@ drawAndCompareByFile=function(file,outputDir=NULL,addDir=NULL,dirNames=NULL,addS
       }
     }
   }
-  
+
   index.doublon=which(allSeg$doublon==TRUE)
-  
+
   xtitle=paste("Position on bac",bac)
   ytitle="Reads"
 
@@ -226,17 +232,17 @@ drawAndCompareByFile=function(file,outputDir=NULL,addDir=NULL,dirNames=NULL,addS
       system(paste("mkdir ",outputDir))
     }
     pdf(paste(outputDir,"/",fileName,".pdf",sep=""),width = 6, height = 8, onefile = FALSE)
-  }   
+  }
 
   ##par(mar=c(5,4,1.5,1), oma=c(0,0,2,0))
   y=1:nbReads
   couleur=ifelse(allSeg$multi,"orange","red")
   couleur=ifelse(allSeg$segType>0,"grey40",couleur)
-  
-  ## Plot only DRJ1 
+
+  ## Plot only DRJ1
   plot(c(infDRJ1,supDRJ1),c(1,nbReads+nbAdd),type="n",xlab=xtitle,ylab=ytitle,main=fileName)
   mtext(paste("drj1 (",supDRJ1-infDRJ1+1, "pb)",sep=""), adj=0)
-    
+
   if(!is.null(addSimi)){
     mismatch=read.table(paste(addSimi,"/",fileName,".tab",sep=""))[,1]
     pcId=100-sum(mismatch)/(sum(mismatch+1))*100
@@ -261,24 +267,24 @@ drawAndCompareByFile=function(file,outputDir=NULL,addDir=NULL,dirNames=NULL,addS
   }
 
   segments(allSeg$inf1,y,allSeg$sup1,y, col=couleur)
-  
+
   points(allSeg$sup1[index.doublon],index.doublon,pch="*")
-  
+
   if(nbAdd>0){
     abline(h=text.y.add,lty=2,col="grey")
     text(infDRJ1, text.y.add,labels=text.add,cex=0.5,pos=4)
     segments(x1.add,y.add,x2.add,y.add, col=couleur.add)
   }
-  
+
   mtext(paste(fileName," : ",length(unique(allSeg$frag))," fragments différents",sep=""), side=3, line=0, adj=0.5, outer=TRUE)
-    
+
   if(!is.null(outputDir)){
     dev.off()
   }
 
   res=c(fileName,as.character(stats))
   return(res)
-  
+
 }
 
 
@@ -294,13 +300,13 @@ compareSummary2=function(drjFile,inputDir,outputDir=NULL,outputFile=NULL,dirName
   if(!is.null(outputFile)){
     pdf(outputFile,width = 6, height = 8)
   }
-  
+
   draw=lapply(drjNames, function(x) drawAndCompareByFile2(x,inputDir,outputDir,dirNames,addSimi))
 
   if(!is.null(outputFile)){
     dev.off()
   }
-  
+
   ## formate les stats de nb de reads par paire de DRJ, sous la forme d'un tableau
   nbData=length(inputDir)
   tmp=matrix(unlist(draw),ncol=1+nbData*2,byrow=T)
@@ -312,13 +318,13 @@ compareSummary2=function(drjFile,inputDir,outputDir=NULL,outputFile=NULL,dirName
     name=paste("data",1:nbData,sep="")
     names(tmp2)=paste(rep(name,rep(2,nbData)),c(".tot",".good"),sep="")
   }
-  
+
   tmp2$name=tmp[,1]
   n=ncol(tmp2)
   stats=tmp2[,c(n,1:(n-1))]
 
-  return(stats)  
-  
+  return(stats)
+
 }
 
 
@@ -334,7 +340,7 @@ drawAndCompareByFile2=function(drjName,inputDir,outputDir=NULL,dirNames=NULL,add
   infDRJ2=as.numeric(coord.DRJs[4])
   supDRJ2=as.numeric(coord.DRJs[5])
 
-  
+
   nbSeg=0
   stats=NULL
   y.seg=NULL
@@ -359,7 +365,7 @@ drawAndCompareByFile2=function(drjName,inputDir,outputDir=NULL,dirNames=NULL,add
       y.seg=c(y.seg,new.y)
       x.doublon=c(x.doublon,seg$sup1[seg$doublon==TRUE])
       y.doublon=c(y.doublon,new.y[seg$doublon==TRUE])
-      
+
       cols=ifelse(seg$multi,"orange","red")
       cols=ifelse(seg$segType>0,"grey40",cols)
       couleur=c(couleur,cols)
@@ -373,14 +379,14 @@ drawAndCompareByFile2=function(drjName,inputDir,outputDir=NULL,dirNames=NULL,add
       text.seg=c(text.seg,paste("(above) segmentations from",dataName))
       y.text=c(y.text,max.y+1)
       max.y=new.max
-      
+
       stats=c(stats,nrow(seg),nrow(seg)-sum(seg$segType>0))
     }
     else{
       stats=c(stats,0,0)
     }
   }
-  
+
   xtitle=paste("Position on bac",bac)
   ytitle="Reads"
 
@@ -391,14 +397,14 @@ drawAndCompareByFile2=function(drjName,inputDir,outputDir=NULL,dirNames=NULL,add
         system(paste("mkdir ",outputDir))
       }
       pdf(paste(outputDir,"/",drjName,".pdf",sep=""),width = 6, height = 8, onefile = FALSE)
-      
+
     }
     ##par(mar=c(5,4,1.5,1), oma=c(0,0,2,0))
-    
-    ## Plot only DRJ1 
+
+    ## Plot only DRJ1
     plot(c(infDRJ1,supDRJ1),c(0,nbSeg),type="n",xlab=xtitle,ylab=ytitle,main=drjName)
     mtext(paste("drj1 (",supDRJ1-infDRJ1+1, "pb)",sep=""), adj=0)
-    
+
     if(!is.null(addSimi)){
       mismatch=read.table(paste(addSimi,"/",drjName,".tab",sep=""))[,1]
       pcId=100-sum(mismatch)/(sum(mismatch+1))*100
@@ -434,8 +440,5 @@ drawAndCompareByFile2=function(drjName,inputDir,outputDir=NULL,dirNames=NULL,add
 
   res=c(drjName,as.character(stats))
   return(res)
-  
+
 }
-
-
-

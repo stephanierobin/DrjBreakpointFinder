@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 #*****************
+# #############################################################################
+# This program aligns and creates the mismatch vector for each read-bac triplet
+#
+# Author: Claire Lemaitre
+# #############################################################################
 
 use strict;
 use warnings;
@@ -237,15 +242,15 @@ sub revcomp {
 }
 
 sub extract_mismatch_vectors_from_ma {
-     
+
     my $infile=shift;
     my $outfile=shift;
     my $rname=shift;
-    
+
     my %sequences=();
     my $name;
     my $nseq=0;
-    
+
     open(R,"<$infile") or die "cannot open file $infile\n";
     while(<R>){
 	chomp();
@@ -262,16 +267,16 @@ sub extract_mismatch_vectors_from_ma {
 	}
     }
     close(R);
-    
-    if(defined $rname){ 
+
+    if(defined $rname){
 	die "$rname is not a sequence of the input file $infile" if not defined $sequences{$rname};
     }
-    
+
     ## attributing the right name to each sequence
     ## -------------------------------------------
     my %bac_inf=();
     foreach my $seq_name (keys(%sequences)){
-	
+
 	if ($seq_name=~/^bac/){
 	    my ($inf)= $seq_name=~/^bac_(\d+)-/;
 	    $bac_inf{$seq_name}=$inf;
@@ -282,9 +287,9 @@ sub extract_mismatch_vectors_from_ma {
 	    }
 	}
     }
-    
+
     my @bacs = sort { $bac_inf{$a} <=> $bac_inf{$b} } keys(%bac_inf);
-    
+
     ## Finding the mismatches
     ## ----------------------
     my $al_length=length($sequences{$rname});
@@ -293,20 +298,20 @@ sub extract_mismatch_vectors_from_ma {
     my $b2_letter="";
     my @vector1;
     my @vector2;
-    
+
     # pour compter où on en est sur lesséquences de bacs
     my $compt1=0;
     my $compt2=0;
     my @vecPos1;
     my @vecPos2;
     for (my $i=0;$i<$al_length;$i++){
-	
+
 	$ref_letter=substr($sequences{$rname},$i,1);
 	$b1_letter=substr($sequences{$bacs[0]},$i,1);
 	$b2_letter=substr($sequences{$bacs[1]},$i,1);
 	if($b1_letter ne "-"){$compt1++;}
 	if($b2_letter ne "-"){$compt2++;}
-	
+
 	if($ref_letter eq "-"){
 	    my $t=@vector1;
 	    if($t>0){
@@ -322,7 +327,7 @@ sub extract_mismatch_vectors_from_ma {
 	}
 
     }
-	
+
     ## writing the results
     open(OUTPUT,">$outfile") or die "cannot open file $outfile\n";
     my $t=@vector1;
@@ -332,4 +337,3 @@ sub extract_mismatch_vectors_from_ma {
     }
     close(OUTPUT);
 }
-

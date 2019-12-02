@@ -1,3 +1,10 @@
+# #############################################################################
+# This file contains the definition of the function getPartialTriplets
+#
+# Author: Claire Lemaitre
+# #############################################################################
+
+
 ## 28/08/2012
 source("hits_functions.R")
 
@@ -17,7 +24,7 @@ source("hits_functions.R")
 getPartialTriplets=function(blastBrutFile,readLengthFile,DRJpairsFile,coordFile,drjPair2IdsFile,bestReadsFile=NULL,id2drjFile=NULL,minPcId=90,minDRJcov=50,minReadCov=85,extend=0){
 
   blast=formatBlastTable(blastBrutFile,readLengthFile)
-    
+
   ## remove_best_reads
   ## enlève les reads pris dans la methode 1 = reads qui chevauchent entierement les DRJs
   if(!is.null(bestReadsFile)){
@@ -36,7 +43,7 @@ getPartialTriplets=function(blastBrutFile,readLengthFile,DRJpairsFile,coordFile,
     DRJpairs=read.table(DRJpairsFile,h=T,fill=T)
     triplets=apply(blast[,c("read","bac","inf2","sup2","orient")],1,function(x) getDRJpairs(x,DRJpairs,minDRJcov))
     triplets=unique(do.call("rbind",triplets))
-    
+
     triplets$id=1:nrow(triplets)
     triplets=triplets[,c("id","read","bac","inf1","sup1","inf2","sup2","orient")]
 
@@ -44,7 +51,7 @@ getPartialTriplets=function(blastBrutFile,readLengthFile,DRJpairsFile,coordFile,
     if(!is.null(id2drjFile)){
       write.table(triplets[,c("id","bac","inf1","sup1","inf2","sup2")],id2drjFile,quote=F,row.names=F)
     }
-    
+
     ## obtenir les idList pour chaque paire de DRJ :
     res=by(triplets,paste(triplets$bac,triplets$inf1,triplets$sup1,triplets$inf2,triplets$sup2,sep="-"), function(x) {
       nbHits=nrow(x)
@@ -52,20 +59,20 @@ getPartialTriplets=function(blastBrutFile,readLengthFile,DRJpairsFile,coordFile,
       idList=paste(x$id,collapse=",")
       return(as.character(c(as.character(x$bac[1]),x$inf1[1],x$sup1[1],x$inf2[1],x$sup2[1],nbHits,nbReads,idList)))
     })
-    
+
     mat=matrix(unlist(res),ncol=8,byrow=T)
     final=as.data.frame(mat)
     names(final)=c("bac","inf1","sup1","inf2","sup2","nbHits","nbReads","idList")
 
     write.table(final,drjPair2IdsFile,quote=F,row.names=F)
-  
+
     ## obtenir les coordonnées des séquences sur le bac, soit les coord des drjs, soit on peut les étendre à gauche et à droite de la valeur "extend"
     coord=triplets
     coord$inf1=pmax(coord$inf1-extend,1)
     coord$sup1=coord$sup1+extend
     coord$inf2=pmax(coord$inf2-extend,1)
     coord$sup2=coord$sup2+extend
-    
+
     write.table(coord,coordFile,quote=F,row.names=F)
   }
   else{
@@ -91,9 +98,9 @@ getDRJpairs=function(blastLine,DRJpairs,minDRJcov){
     over1.sup=pmin(tab$sup1,supR)
     over2.inf=pmax(tab$inf2,infR)
     over2.sup=pmin(tab$sup2,supR)
-    
+
     select=tab[(over1.sup-over1.inf+1)>=tab$minT | (over2.sup-over2.inf+1)>=tab$minT,]
-    
+
     select$read=rep(blastLine[1],nrow(select))
     select$orient=rep(blastLine[5],nrow(select))
     return(select)

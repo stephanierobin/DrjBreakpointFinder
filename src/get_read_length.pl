@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 #*****************
+# #############################################################################
+# This program creates a table with the length of each read, from a fasta file
+#
+# Author: Claire Lemaitre
+# #############################################################################
 
 #use strict;
 use warnings;
@@ -15,7 +20,7 @@ Create a table with the length of each read, from a fasta file
 Usage : $0
 Mandatory
    -reads    :  input read file (fasta format)
-   -out      :  output file 
+   -out      :  output file
 
 Details : output format = one line per sequence with its name and length separated by a space
 -----------------------------------------------------------------------
@@ -54,7 +59,7 @@ MAIN:
 		}
 	}
     print outFile $name." ".$myLength."\n";
-    
+
     close(R);
     close (outFile);
 }

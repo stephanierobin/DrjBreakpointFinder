@@ -1,3 +1,9 @@
+# #########################################################################
+# This file contains the definition of the function segmentASetOfSequences
+#
+# Author: Claire Lemaitre
+# #########################################################################
+
 source("Cassis-segmentation-light.R")
 
 segmentASetOfSequences=function(coordFile,vectorDir,figureDir,segResultFile,zoom=T,margin=20,clean=F){
@@ -21,10 +27,10 @@ segmentASequence=function(coordLine,vectorDir,figureDir,zoom=T,margin=20,clean=F
   vectorTab=read.table(paste(vectorDir,"/",id,".tab",sep=""))
 
   if(zoom){
-    ## on utilise les coordonnées des chevauchements des hits blast sur le read (attention : pas les coord exactes de la drj) 
+    ## on utilise les coordonnées des chevauchements des hits blast sur le read (attention : pas les coord exactes de la drj)
     drjInf=as.numeric(coordLine[9])
     drjSup=as.numeric(coordLine[10])
-    
+
     index.inf=max(1,drjInf-margin)
     index.sup=min(nrow(vectorTab),drjSup+margin)
     vectorTab=vectorTab[index.inf:index.sup,]
@@ -45,11 +51,11 @@ segmentASequence=function(coordLine,vectorDir,figureDir,zoom=T,margin=20,clean=F
       return(data.frame(id,read,bac,br.beg1=0,br.end1=0,br.beg2=0,br.end2=0,stat=0,nbAlt=0,nbDiff=0))
     }
   }
-   
+
   pdf(paste(figureDir,"/",id,".pdf",sep=""),width = 6, height = 6, onefile = FALSE)
   resSeg=segmentAndPlotABreak(vectorTab)
   dev.off()
-  
+
   N=nrow(vectorTab)
   x1=resSeg[2]
   x2=resSeg[3]
@@ -86,7 +92,7 @@ segmentASequence=function(coordLine,vectorDir,figureDir,zoom=T,margin=20,clean=F
     br.beg1=inf.bac1+vectorTab[x1,3]
     br.beg2=inf.bac2+vectorTab[x1,4]
   }
-    
+
   nbAlt=getNbOfAlternation(vectorTab[x1:x2,])
   nbDiff=getNbOfDifferences(vectorTab[x1:x2,])
   res=data.frame(id,read,bac,br.beg1,br.end1,br.beg2,br.end2,stat,nbAlt,nbDiff)
