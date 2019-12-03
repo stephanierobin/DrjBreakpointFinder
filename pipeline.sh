@@ -63,6 +63,11 @@ source /local/env/envncbi.sh
 source /local/env/envr-3.5.1.sh
 source /local/env/envemboss.sh
 
+#src DIR
+EDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+srcDIR=$EDIR/src/
+
+
 ## Intermediate files or directories
 blastDir=$output/blast
 blastFile=$blastDir/megablast_result.m8
@@ -82,8 +87,10 @@ summaryDir=$output/drjPairs_figures
 alignPairDir=$output/drjPairs_alignments
 vectorPairDir=$alignPairDir/vectors
 
-mkdir $output
+mkdir -p $output
 mkdir -p $blastDir
+
+echo "Running Megablast..."
 
 formatdb -i $genome -p F -o T
 megablast -i $reads -d $genome -o $blastFile -m8 > $blastDir/megablast.log 2>&1
@@ -91,21 +98,28 @@ mv formatdb.log $blastDir/
 
 echo "Megablast finished"
 
-perl get_read_length.pl  -reads $reads -out $readLength
+perl $srcDIR/get_read_length.pl  -reads $reads -out $readLength
 
 mkdir -p $breakpointDir
 
 
+echo "Selecting sequence triplets..."
+
 R --slave --vanilla --quiet --no-save  <<MyRScript1
 
+mydir = getwd()
+setwd("$srcDIR")
 source("get_fully_overlapping_triplets.R")
-getFullyOverlappingTriplets(blastFile="$blastFile",readLengthFile="$readLength",coordFile="$seqCoordPairs",drjPairsFile="$drjPairs")
+setwd(mydir)
+res=getFullyOverlappingTriplets(blastFile="$blastFile",readLengthFile="$readLength",coordFile="$seqCoordPairs",drjPairsFile="$drjPairs")
 
 MyRScript1
 
  echo "Triplets selection finished"
 
- perl align_and_get_mismatch_vectors.pl -coord $seqCoordPairs -bacs $genome -reads $reads -dirFasta $breakpointDir/tmp -dirAlign $alignDir -dirVector $vectorDir
+echo "Aligning triplets..."
+
+ perl $srcDIR/align_and_get_mismatch_vectors.pl -coord $seqCoordPairs -bacs $genome -reads $reads -dirFasta $breakpointDir/tmp -dirAlign $alignDir -dirVector $vectorDir
 
  echo "All triplet Alignments finished"
 
@@ -113,31 +127,44 @@ MyRScript1
  mkdir -p $pairDir
  mkdir -p $pairDirFinal
 
+echo "Performing segmentation..."
+
 R --slave --vanilla --quiet --no-save  <<MyRScript2
 
+mydir = getwd()
+setwd("$srcDIR")
 source("get_segmentation.R")
+source("get_segmentations_by_DRJpairs.R")
+source("merge_segments_on_drj_pairs.R")
+setwd(mydir)
+
 segmentASetOfSequences("$seqCoordPairs","$vectorDir","$figureDir","$segmentationResult",zoom=T,margin=20)
 
-source("get_segmentations_by_DRJpairs.R")
 getAllValidSegmentationsByDRJPair(segmentationFile="$segmentationResult",drjPairsFile="$drjPairs",pairDir="$pairDir",confirmedDrjPairFile="$confirmedDrjPairs",multipleLog="$multipleLog")
 
-source("merge_segments_on_drj_pairs.R")
 mergeAllDrjs(inputPairDir="$pairDir",outputPairDir="$pairDirFinal")
 
 MyRScript2
 
 echo "All segmentations finished"
 
+echo "Aligning DRJ pairs..."
+
 mkdir -p $alignPairDir
-perl align_drjPairs.pl -coord $drjPairs -bacs $genome -dirFasta $alignPairDir/tmp -dirAlign $alignPairDir/align -dirVector $vectorPairDir
+perl $srcDIR/align_drjPairs.pl -coord $drjPairs -bacs $genome -dirFasta $alignPairDir/tmp -dirAlign $alignPairDir/align -dirVector $vectorPairDir
 
 echo "Alignments of DRJ pairs (similarity) finished"
 
 mkdir -p $summaryDir
 
+echo "Drawing summary plots..."
+
 R --slave --vanilla --quiet --no-save  <<MyRScript4
 
+mydir = getwd()
+setwd("$srcDIR")
 source("draw_summary_scaffolds.R")
+setwd(mydir)
 drawAllSummary(pairDir="$pairDir",outputDir="$summaryDir",readNames=FALSE,addSimi="$vectorPairDir",merge=TRUE)
 
 MyRScript4
