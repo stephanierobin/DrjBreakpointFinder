@@ -27,12 +27,18 @@ git clone git@github.com:stephanierobin/DrjBreakpointFinder.git
 sh pipeline.sh -r reads.fa -g genome.fa -i input_directory -o output_directory
 ```
 
+Example with the small test dataset:
+
+```
+sh pipeline.sh -r test/reads.fasta -g test/genome.fasta -i test -o test/drj
+```
+
 ## User manual
 
 
 ## Input
 * `reads.fasta`: a fasta file containing reads from virus sequencing (circular form of the proviral segments).
-* `genome.fa`: a fasta file containing the host genome sequence.
+* `genome.fasta`: a fasta file containing the host genome sequence.
 
 ## Output
 
