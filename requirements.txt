@@ -1,0 +1,4 @@
+blast=2.9.0
+clustalw=2.1
+emboss=6.6.0.0
+R=3.5.1
