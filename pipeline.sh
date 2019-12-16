@@ -58,15 +58,15 @@ fi
 
 
 ## Genocluster :
-source /local/env/envclustalw.sh
-source /local/env/envncbi.sh
+. /local/env/envconda.sh
+conda activate  --stack /groups/bipaa/local/blast
+conda activate  --stack /groups/bipaa/local/clustalw
+conda activate  --stack /groups/bipaa/local/emboss
 source /local/env/envr-3.5.1.sh
-source /local/env/envemboss.sh
 
 #src DIR
 EDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-srcDIR=$EDIR/src/
-
+srcDIR=$EDIR/src
 
 ## Intermediate files or directories
 blastDir=$output/blast
@@ -92,9 +92,8 @@ mkdir -p $blastDir
 
 echo "Running Megablast..."
 
-formatdb -i $genome -p F -o T
-megablast -i $reads -d $genome -o $blastFile -m8 > $blastDir/megablast.log 2>&1
-mv formatdb.log $blastDir/
+makeblastdb -in $genome -input_type fasta -dbtype nucl
+blastn -task megablast -query $reads -db $genome -outfmt 6 -out $blastDir/megablast_result.m8 2>&1
 
 echo "Megablast finished"
 
