@@ -1,11 +1,13 @@
 #! /bin/sh
 
+
 # #######################################################################################################
-# DrjBreakpointFinder identifies the precise recombination breakpoints in Direct Repeat Junctions (DRJs) 
-# of viral insertions in the host genome. 
+# DrjBreakpointFinder identifies the precise recombination breakpoints in Direct Repeat Junctions (DRJs)
+# of viral insertions in the host genome.
 #
 # Authors: Stéphanie Robin, Claire Lemaitre
 # #######################################################################################################
+
 
 red=`tput setaf 1`
 green=`tput setaf 2`
