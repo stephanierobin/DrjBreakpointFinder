@@ -21,10 +21,12 @@ function help {
 echo "====================="
 echo "DrjBreakpointFinder"
 echo "====================="
-echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -i input_directory -o output_directory"
+#echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -i input_directory -o output_directory"
+echo "Usage: sh pipeline.sh -r reads.fasta -g genome.fasta -o output_directory"
+
 }
 
-while getopts "r:g:i:o:h" opt; do
+while getopts "r:g:o:h" opt; do
     case $opt in
         r)
         reads=$OPTARG
@@ -34,9 +36,9 @@ while getopts "r:g:i:o:h" opt; do
         genome=$OPTARG
         ;;
 
-        i)
-        input=$OPTARG
-        ;;
+        #i)
+        #input=$OPTARG
+        #;;
 
         o)
         output=$OPTARG
@@ -57,10 +59,10 @@ if [[ -z "${genome}" ]]; then
     echo "${red}-g is mandatory$reset" >&2
     exit
 fi
-if [[ -z "${input}" ]]; then
-    echo "${red}-i is mandatory$reset" >&2
-    exit
-fi
+#if [[ -z "${input}" ]]; then
+#    echo "${red}-i is mandatory$reset" >&2
+#    exit
+#fi
 if [[ -z "${output}" ]]; then
     echo "${red}-o is mandatory$reset" >&2
     exit
@@ -81,7 +83,8 @@ srcDIR=$EDIR/src
 ## Intermediate files or directories
 blastDir=$output/blast
 blastFile=$blastDir/megablast_result.m8
-readLength=$input/$(basename $reads .fasta)"_rlength.tab"
+readLengthDir=$output/readLength
+readLength=$readLengthDir/$(basename $reads .fasta)"_rlength.tab"
 breakpointDir=$output/breakpoint
 drjPairs=$breakpointDir/drjPairs.tab
 seqCoordPairs=$breakpointDir/seqCoordPairs.tab
@@ -106,6 +109,8 @@ makeblastdb -in $genome -input_type fasta -dbtype nucl
 blastn -task megablast -query $reads -db $genome -outfmt 6 -out $blastDir/megablast_result.m8 2>&1
 
 echo "Megablast finished"
+
+mkdir -p $readLengthDir
 
 perl $srcDIR/get_read_length.pl  -reads $reads -out $readLength
 
