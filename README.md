@@ -20,6 +20,13 @@ git clone git@github.com:stephanierobin/DrjBreakpointFinder.git
 * bash
 * BLAST
 * clustalw
+* emboss
+
+To activate conda environments :
+
+```
+conda activate myenv
+```
 
 ## Usage
 
@@ -37,23 +44,21 @@ sh pipeline.sh -r test/reads.fasta -g test/genome.fasta -i test -o test/drj
 
 
 ## Input
-* `reads.fasta`: a fasta file containing reads from virus sequencing (circular form of the proviral segments).
-* `genome.fasta`: a fasta file containing the host genome sequence.
+* `reads.fasta` : a fasta file containing reads from virus sequencing (circular form of the proviral segments).
+* `genome.fasta` : a fasta file containing the host genome sequence.
 
 ## Output
 
-An output directory containing different subdirectories :
-* blast
-* breakpoint
-* drjPairs_alignments
-* drjPairs_all_segments
-* drjPairs_figures
-* drjPairs_merged_segments
-
-
-
-## 2 pipelines
-
+An output directory containing :
+* Seven subdirectories :
+	* `blast` : Megablast results
+	* `readLength` : table containing the lengths of reads
+	* `breakpoint` : mismatch vectors, for each read-bac triplet
+	* `drjPairs_alignments` : mismatch vectors, for each pair of DRJs
+	* `drjPairs_all_segments` : intermediate results 
+	* `drjPairs_figures` : figures summarizing results, for each pair of DRJs
+	* `drjPairs_merged_segments` : intermediate results 
+* a file `drjPairs_confirmed.tab` containing the confirmed DRJ pairs coordinates, and the number of reads which allowed identification of these DRJ pairs.
 
 
 ## References
