@@ -69,13 +69,6 @@ if [[ -z "${output}" ]]; then
 fi
 
 
-## Genocluster :
-. /local/env/envconda.sh
-conda activate  --stack /groups/bipaa/local/blast
-conda activate  --stack /groups/bipaa/local/clustalw
-conda activate  --stack /groups/bipaa/local/emboss
-source /local/env/envr-3.5.1.sh
-
 #src DIR
 EDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 srcDIR=$EDIR/src
